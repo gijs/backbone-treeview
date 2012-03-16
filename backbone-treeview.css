@@ -1,0 +1,28 @@
+li
+{
+    list-style-type: none;
+}
+
+ul.tree
+{
+    padding-left: 5px;
+}
+
+ul.tree li
+{
+    border-left: 1px solid gray;
+    padding-left: 20px;
+}
+
+
+/* This combination enables a border that extends to the correct location
+   and looks nice */
+ul.tree li.last-item
+{
+    border-left-color: transparent;
+}
+ul.tree li.dummy-item
+{
+    height: 0.75em;
+    margin-bottom: -0.75em;
+}
