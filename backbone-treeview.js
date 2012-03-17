@@ -25,15 +25,17 @@ window.TreeNodeCollection = Backbone.Collection.extend({
 });
 
 
-
 /* Tree view is attached to a single node (root) and built automatically */
 window.TreeView = Backbone.View.extend({
     tagName: 'li',
     template: '<a class="title"></a><ul class="nav nav-list tree"></ul>',
 
     initialize: function() {
-        // Listen to model changes for rendering
-        this.model.bind('change', this.render, this);
+        // When models children change, rebuild the tree
+        this.model.bind('change:children', this.render, this);
+
+        // Listen to model changes for updating view
+        this.model.bind('change', this.update, this);
 
         // Traverse model to build list of child views
         var childViews = [];
@@ -45,18 +47,25 @@ window.TreeView = Backbone.View.extend({
         this.childViews = childViews;
     },
 
+    update: function() {
+        this.$('.title').first().html(this.model.get('title'));
+    },
+
     render: function() {
-        // Load HTML template and 
+        // Load HTML template
         this.$el.html(this.template);
 
         // Render this node
-        this.$('.title').html(this.model.get('title'));
+        this.update();
 
-        // Insert child nodes and render them as well
-        var ul = this.$('ul.tree');
-        _.each(this.childViews, function(view) {
-            ul.append(view.$el);
-            view.render();
+        // Build child views, insert and render each
+        var tree = this.$('ul.tree');
+        _.each(this.model.getChildren(), function(model) {
+            var childView = new TreeView({
+                model: model,
+            });
+            tree.append(childView.$el);
+            childView.render();
         });
 
         return this;
