@@ -4,6 +4,20 @@ window.TreeNodeModel = Backbone.Model.extend({
         title: 'Item',
         children: [],   // Children are represented as ids not objects
     },
+
+    /* Return an array of actual TreeNodeModel instances
+     * override this function depending on how children are store
+     */
+    getChildren: function() {
+        return _.map(this.get('children'), function(ref) {
+            // Lookup by ID in parent collection if string/num
+            if (typeof(ref) == 'string' || typeof(ref) == 'number')
+                return this.collection.get(ref);
+
+            // Else assume its a real object
+            return ref; 
+        });
+    },
 });
 
 
