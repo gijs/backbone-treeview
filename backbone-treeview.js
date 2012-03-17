@@ -59,20 +59,19 @@ window.TreeView = Backbone.View.extend({
         this.update();
 
         // Build child views, insert and render each
-        var tree = this.$('ul.tree');
+        var tree = this.$('ul.tree'), childView = null;
         _.each(this.model.getChildren(), function(model) {
-            var childView = new TreeView({
+            childView = new TreeView({
                 model: model,
             });
             tree.append(childView.$el);
             childView.render();
         });
 
+        // Fixup css on last item to improve look of tree
+        if (childView)
+            childView.$el.addClass('last-item').before($('<li/>').addClass('dummy-item'));
+
         return this;
     },
 });
-
-$(function() {
-    // Fixup look of last element in each list
-    $('ul.tree li.last-item').before($('<li/>').addClass('dummy-item'));
-}); 
