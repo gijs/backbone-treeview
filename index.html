@@ -17,61 +17,7 @@
 <body>
 
   <div class="container">
-
-    <ul class="nav nav-list">
-      <li>
-        <a href="#">One</a>
-        <ul class="nav nav-list tree">
-          <li>A</li>
-          <li class="last-item">B</li>
-        </ul>
-      </li>
-      <li><a href="#">One</a></li>
-      <li>
-        <a href="#">One</a>
-        <ul class="nav nav-list tree">
-          <li>A</li>
-          <li>
-            <a href="#">B</a>
-            <ul class="nav nav-list tree">
-              <li>A</li>
-              <li>B</li>
-              <li>C</li>
-              <li class="last-item">D</li>
-            </ul>
-          </li>
-          <li>C</li>
-          <li>D</li>
-        <li class="last-item">
-          <a href="#">E</a>
-          <ul class="nav nav-list tree">
-            <li>A.1</li>
-            <li>A.2</li>
-            <li class="last-item">
-              <a href="#">One</a>
-              <ul class="nav nav-list tree">
-                <li>A</li>
-                <li>B</li>
-                <li>C</li>
-                <li>D</li>
-                <li class="last-item">
-                  <a href="#">E</a>
-                  <ul class="nav nav-list tree">
-                    <li>A.1</li>
-                    <li>A.2</li>
-                    <li class="last-item">A.3</li>
-                  </ul>
-                </li>
-              </ul>
-            </li>
-          </ul>
-        </li>
-        </ul>
-      </li>
-      <li><a href="#">One</a></li>
-      <li class="last-item"><a href="#">One</a></li>
-    </ul>
-
+    <div id="tree-view"></div>
   </div>
 
 <!--===== JS =======-->
@@ -80,8 +26,55 @@
   <script src="js/underscore-min.js" type="text/javascript"></script>
   <script src="js/backbone-min.js" type="text/javascript"></script>
 
-  <!-- Site -->
+  <!-- Treeview -->
   <script src="backbone-treeview.js"></script>
+
+  <script>
+
+    // Create a collection of nodes and populate with sample data
+    var collection = new TreeNodeCollection([
+        {
+            id: 0,
+            title: 'Root',
+            children: [1, 2, 3],
+        },
+        {
+            id: 1,
+            title: 'Node 1',
+            children: [],
+        },
+        {
+            id: 2,
+            title: 'Node 2',
+            children: [4, 5],
+        },
+        {
+            id: 3,
+            title: 'Node 3',
+            children: [],
+        },
+        {
+            id: 4,
+            title: 'Node 4',
+            children: [],
+        },
+        {
+            id: 5,
+            title: 'Node 5',
+            children: [],
+        },
+    ]);
+
+    // Instantiate a TreeView on the root
+    var treeView = new TreeView({
+        el: $('#tree-view'),
+        model: collection.get(0),
+    });
+
+    // Render view
+    treeView.render();
+  
+  </script>
 
 </body>
 </html>

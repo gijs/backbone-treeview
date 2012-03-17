@@ -1,7 +1,7 @@
-/* Single node in tree */
+/* Single node object in tree */
 window.TreeNodeModel = Backbone.Model.extend({
     defaults: {
-        title: 'Item',
+        title: 'Node',
         children: [],   // Children are represented as ids not objects
     },
 
@@ -15,35 +15,50 @@ window.TreeNodeModel = Backbone.Model.extend({
                 return this.collection.get(ref);
 
             // Else assume its a real object
-            return ref; 
+            return ref;
         });
     },
 });
 
-
-/* Collection of all nodes, manages node relationships */
 window.TreeNodeCollection = Backbone.Collection.extend({
     model: TreeNodeModel,
 });
 
 
-/* View for a single node */
-window.TreeNodeView = Backbone.View.extend({
+
+/* Tree view is attached to a single node (root) and built automatically */
+window.TreeView = Backbone.View.extend({
     tagName: 'li',
     template: '<a class="title"></a><ul class="nav nav-list tree"></ul>',
 
     initialize: function() {
-        this.inflate();
-    },
+        // Listen to model changes for rendering
+        this.model.bind('change', this.render, this);
 
-    // Load base HTML, should really only be called once
-    inflate: function() {
-        this.$el.html(this.template);
-        return this;
+        // Traverse model to build list of child views
+        var childViews = [];
+        _.each(this.model.getChildren(), function(model) {
+            childViews.push(new TreeView({
+                model: model,
+            }));
+        });
+        this.childViews = childViews;
     },
 
     render: function() {
-        this.$el.find('title').html(this.model.get('title'));
+        // Load HTML template and 
+        this.$el.html(this.template);
+
+        // Render this node
+        this.$('.title').html(this.model.get('title'));
+
+        // Insert child nodes and render them as well
+        var ul = this.$('ul.tree');
+        _.each(this.childViews, function(view) {
+            ul.append(view.$el);
+            view.render();
+        });
+
         return this;
     },
 });
