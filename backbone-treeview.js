@@ -9,6 +9,13 @@ window.TreeNodeModel = Backbone.Model.extend({
         children: [],   // Children are represented as ids not objects
     },
 
+    /* Return a suitable label for the Node
+     * override this function to better serve the view
+     */
+    getLabel: function() {
+        return this.get('title');
+    },
+
     /* Return an array of actual TreeNodeModel instances
      * override this function depending on how children are store
      */
@@ -32,7 +39,7 @@ window.TreeNodeCollection = Backbone.Collection.extend({
 /* Tree view is attached to a single node (root) and built automatically */
 window.TreeView = Backbone.View.extend({
     tagName: 'li',
-    template: '<a class="collapse-control" href="#"><span class="title"></span></a><ul class="nav nav-list tree"></ul>',
+    template: '<a class="node-collapse" href="#"><span class="node-label"></span></a><ul class="nav nav-list node-tree"></ul>',
 
     initialize: function() {
         // When models children change, rebuild the tree
@@ -48,26 +55,26 @@ window.TreeView = Backbone.View.extend({
     setupEvents: function() {
         // Hack to get around event delegation not supporting ">" selector
         var that = this;
-        this.$('> .collapse-control').click(function() { return that.toggleCollapse(); });
+        this.$('> .node-collapse').click(function() { return that.toggleCollapse(); });
     },
 
     toggleCollapse: function() {
         this.collapsed = !this.collapsed;
         if (this.collapsed)
         {
-            this.$('> .collapse-control i').attr('class', 'icon-plus');
-            this.$('> ul.tree').slideUp(COLLAPSE_SPEED);
+            this.$('> .node-collapse i').attr('class', 'icon-plus');
+            this.$('> .node-tree').slideUp(COLLAPSE_SPEED);
         }
         else
         {
-            this.$('> .collapse-control i').attr('class', 'icon-minus');
-            this.$('> ul.tree').slideDown(COLLAPSE_SPEED);  
+            this.$('> .node-collapse i').attr('class', 'icon-minus');
+            this.$('> .node-tree').slideDown(COLLAPSE_SPEED);  
         }
     },
 
     update: function() {
-        this.$('> a .title').html(this.model.get('title'));
-        this.collapsed && this.$('> ul.tree').hide() || this.$('> ul.tree').show();
+        this.$('> a .node-label').html(this.model.getLabel());
+        this.collapsed && this.$('> .node-tree').hide() || this.$('> .node-tree').show();
     },
 
     render: function() {
@@ -79,7 +86,7 @@ window.TreeView = Backbone.View.extend({
         this.update();
 
         // Build child views, insert and render each
-        var tree = this.$('> ul.tree'), childView = null;
+        var tree = this.$('> .node-tree'), childView = null;
         _.each(this.model.getChildren(), function(model) {
             childView = new TreeView({
                 model: model,
@@ -92,7 +99,7 @@ window.TreeView = Backbone.View.extend({
         if (childView)
         {
             // Add bootstrap plus/minus icon
-            this.$('> .collapse-control').prepend($('<i class="icon-plus"/>'));
+            this.$('> .node-collapse').prepend($('<i class="icon-plus"/>'));
 
             // Fixup css on last item to improve look of tree
             childView.$el.addClass('last-item').before($('<li/>').addClass('dummy-item'));   
